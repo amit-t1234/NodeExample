@@ -4,12 +4,13 @@ const pool = require('../../config/database');
 module.exports = {
     create: (data, callBack) => {
         pool.query(
-            `insert into registration(firstName, lastName, gender, password, number)
-            values(?,?,?,?,?)`,
+            `insert into registration(firstName, lastName, gender, email, password, number)
+            values(?,?,?,?,?,?)`,
             [
                 data.first_name, 
                 data.last_name,
                 data.gender,
+                data.email,
                 data.password,
                 data.number
             ],
@@ -23,7 +24,7 @@ module.exports = {
     },
     getUsers: (callBack) => {
         pool.query(
-            `SELECT firstName, lastName, gender, password, number FROM registration`,
+            `SELECT firstName, lastName, gender, email, password, number FROM registration`,
             [],
             (error, results, fields) => {
                 if (error) {
@@ -35,7 +36,7 @@ module.exports = {
     },
     getUserById: (id, callBack) => {
         pool.query(
-            `SELECT firstName, lastName, gender, password, number FROM registration WHERE id= ?`,
+            `SELECT firstName, lastName, gender, email, password, number FROM registration WHERE id= ?`,
             [id],
             (error, results, fields) => {
                 if (error) {
@@ -45,13 +46,26 @@ module.exports = {
             }
         );
     },
+    getUserByEmail: (email, callBack) => {
+        pool.query(
+            `SELECT * FROM registration WHERE email= ?`,
+            [email],
+            (error, results, fields) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results[0]);
+            }
+        );
+    },    
     updateUser: (data, callBack) => {
         pool.query(
-            `UPDATE registration SET firstName=?, lastName=?, gender=?, password=?, number=? WHERE id= ?`,
+            `UPDATE registration SET firstName=?, lastName=?, gender=?, email=?, password=?, number=? WHERE id= ?`,
             [
                 data.first_name, 
                 data.last_name,
                 data.gender,
+                data.email,
                 data.password,
                 data.number,
                 data.id
