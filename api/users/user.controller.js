@@ -2,14 +2,17 @@ const { create, getUsers, getUserById, getUserByEmail, updateUser, deleteUser } 
 const { hashSync, genSaltSync, compareSync } = require('bcryptjs');
 const { sign } = require('jsonwebtoken');
 
+const { logger } = require('../../config/logger');
+
 module.exports = {
 	createUser: (req, res) => {
 		const body = req.body;
 		console.log(body);
-		const salt = genSaltSync(10);
+		const salt = genSaltSync(10);		
 		body.password = hashSync(body.password, salt);
 		create (body, (err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return res.status(500).json({
 					success: 0,
@@ -25,6 +28,7 @@ module.exports = {
 	getUsers: (req, res) => {
 		getUsers((err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return;
 			}
@@ -38,6 +42,7 @@ module.exports = {
 		const id = req.params.id;
 		getUserById(id, (err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return;
 			}
@@ -59,10 +64,12 @@ module.exports = {
 		body.password = hashSync(body.password, salt);
 		updateUser (body, (err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return;
 			}
 			if (!results) {
+				logger.error('update unsuccessful');
 				return res.json({
 					success: 0,
 					message: "Update was unsuccessful"
@@ -78,10 +85,12 @@ module.exports = {
 		const data = req.body;
 		deleteUser(data, (err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return;
 			}
 			if (!results) {
+				logger.error('Record Not Found');
 				return res.json({
 					success: 0,
 					message: "Record Not Found"
@@ -97,10 +106,12 @@ module.exports = {
 		const body = req.body;
 		getUserByEmail(body.email, (err, results) => {
 			if (err) {
+				logger.error(err);
 				console.log(err);
 				return;
 			}
 			if (!results) {
+				logger.error('Invalid email or password');
 				return res.json({
 					success: 0,
 					message: "Invalid email or password"
@@ -118,6 +129,7 @@ module.exports = {
 					token: jsontoken
 				});
 			} else {
+				logger.error('Invalid email or password');
 				return res.json({
 					success: 0,
 					data: "Invalid email or password"
